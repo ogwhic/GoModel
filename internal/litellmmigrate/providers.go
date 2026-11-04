@@ -62,7 +62,7 @@ var providerKinds = map[string]providerKind{
 	"meta_llama":             {Type: "meta", KeyEnv: "LLAMA_API_KEY"},
 	"llamafile":              {Type: "openai", Name: "llamafile", BaseURL: "http://127.0.0.1:8080/v1"},
 	"lm_studio":              {Type: "openai", Name: "lm-studio", BaseURL: "http://localhost:1234/v1"},
-	"mistral":                {Type: "openai", Name: "mistral", BaseURL: "https://api.mistral.ai/v1", KeyEnv: "MISTRAL_API_KEY"},
+	"mistral":                {Type: "mistral", KeyEnv: "MISTRAL_API_KEY"},
 	"together_ai":            {Type: "openai", Name: "together-ai", BaseURL: "https://api.together.xyz/v1", KeyEnv: "TOGETHERAI_API_KEY"},
 	"perplexity":             {Type: "openai", Name: "perplexity", BaseURL: "https://api.perplexity.ai", KeyEnv: "PERPLEXITYAI_API_KEY"},
 	"deepinfra":              {Type: "openai", Name: "deepinfra", BaseURL: "https://api.deepinfra.com/v1/openai", KeyEnv: "DEEPINFRA_API_KEY"},

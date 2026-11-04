@@ -313,6 +313,7 @@
                             "providers/deepseek",
                             "providers/deepinfra",
                             "providers/together",
+                            "providers/mistral",
                             "providers/xai",
                             "providers/bailian",
                             "providers/xiaomi",

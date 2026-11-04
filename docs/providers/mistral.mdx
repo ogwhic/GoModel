@@ -1,0 +1,77 @@
+---
+title: "Mistral AI"
+description: "Configure Mistral AI (La Plateforme) in GoModel for chat, Responses, and embeddings."
+icon: "server"
+tag: "Beta"
+keywords: ["Mistral", "Mistral AI", "La Plateforme", "provider setup", "embeddings"]
+---
+
+<Warning>
+  Mistral AI support is in beta. It is covered by automated tests against a
+  simulated API but has not yet been verified against the live Mistral AI
+  service. Please report any issues you hit.
+</Warning>
+
+Mistral AI serves its models through an OpenAI-compatible API at
+`https://api.mistral.ai/v1`. GoModel routes these endpoints to it:
+
+| GoModel endpoint | Mistral AI models |
+| ---------------- | ----------------- |
+| `/v1/chat/completions` | chat models (`mistral-large-latest`, `pixtral-12b-2409`, ...) |
+| `/v1/responses` | chat models, translated through chat completions |
+| `/v1/embeddings` | embedding models (`mistral-embed`) |
+
+## Configure
+
+Create an API key in the [Mistral AI console](https://console.mistral.ai/api-keys/) and set:
+
+```bash
+MISTRAL_API_KEY=...
+```
+
+Or in `config.yaml`:
+
+```yaml
+providers:
+  mistral:
+    type: mistral
+    api_key: "${MISTRAL_API_KEY}"
+    # base_url defaults to "https://api.mistral.ai/v1".
+```
+
+Override the base URL or set a model list only when you need to, for example
+to point at a proxy:
+
+```bash
+MISTRAL_BASE_URL=https://api.mistral.ai/v1
+MISTRAL_MODELS=mistral-large-latest,mistral-embed
+```
+
+`MISTRAL_MODELS` is a fallback list, used only when `/models` fails or is
+empty; `CONFIGURED_PROVIDER_MODELS_MODE=allowlist` makes it the only list.
+
+## Models
+
+GoModel reads Mistral's live `/models` listing and records each model's
+reported capabilities (function calling, vision, JSON mode, FIM, OCR) as
+Mistral reports them — a model listed without vision is not advertised as
+vision-capable by this provider. Use model IDs verbatim, or prefix the
+provider name to pin the route:
+
+```bash
+curl http://localhost:8080/v1/chat/completions \
+  -H "Authorization: Bearer $GOMODEL_MASTER_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"model": "mistral/mistral-large-latest", "messages": [{"role": "user", "content": "Hello"}]}'
+```
+
+## Behavior notes
+
+- **Responses go through chat completions.** GoModel translates Responses
+  requests to chat completions, which every Mistral chat model supports. With
+  a GoModel response store configured, `previous_response_id` chains work:
+  the gateway replays the stored history.
+- **Passthrough is opt-in.** Add `mistral` to `ENABLED_PASSTHROUGH_PROVIDERS`
+  to expose `/p/mistral/...`, which forwards any path under the base URL with
+  the gateway's Mistral key. Use it for Mistral endpoints GoModel does not
+  route, such as `/fim/completions` or `/ocr`.
